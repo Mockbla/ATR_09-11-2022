@@ -1,0 +1,4 @@
+﻿  Processo.cpp
+  The contents of <format> are available only with C++20 or later.
+C:\Users\avela\Desktop\ATR\Processo\Processo\Processo.cpp(122,12): warning C4101: 'ThreadComputadorProcesso': unreferenced local variable
+  Processo.vcxproj -> C:\Users\avela\Desktop\ATR\Processo\x64\Debug\Processo.exe
