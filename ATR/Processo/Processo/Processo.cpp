@@ -11,6 +11,8 @@
 #include<chrono>
 #include <format>
 #include <cstring>
+
+
 //DEFINICAO DO VALOR NUMERICO DE CADA TECLA PARA A FUNCAO _GETCH
 #define	ESC 27
 #define C 99

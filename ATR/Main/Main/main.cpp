@@ -5,7 +5,6 @@
 #include <filesystem>
 #include<iostream>
 #include <conio.h>        // _getch()
-//#include "Exemplo64.h"
 
 
 
@@ -14,6 +13,20 @@ int main()
     BOOL bStatus;
     STARTUPINFO si;            // StartUpInformation para novo processo
     PROCESS_INFORMATION NewProcess;    // Informações sobre novo processo criado
+
+    HANDLE hMailsSlotS;
+
+    hMailsSlotS = CreateFileA(
+        "\\\\.\\mailslot\\MyMailslot",
+        GENERIC_WRITE,
+        FILE_SHARE_READ,
+        NULL,
+        OPEN_EXISTING,
+        FILE_ATTRIBUTE_NORMAL,
+        NULL
+    );
+
+
 
     // Cria um objeto do tipo evento para sincronizar dois processos
     // O evento será sinalizado quando o servidor tiver criado o mailslot
