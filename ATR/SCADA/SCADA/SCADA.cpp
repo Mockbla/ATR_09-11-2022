@@ -23,8 +23,9 @@ DWORD WINAPI MensagensFunc(LPVOID);
 DWORD WINAPI AlarmesFunc(LPVOID);
 long float generateRandom(int inicial, int final);
 
-HANDLE
-hThreads[3];
+HANDLE hThreads[3];
+HANDLE hMailslot;
+
 
 extern char listaCircular[100][50];
 
@@ -36,7 +37,15 @@ int main() {
     DWORD dwThreadId;
     DWORD dwExitCode = 0;
     DWORD dwRet;
-
+    hMailslot = CreateFileA(
+        "\\\\.\\mailslot\\MyMailslot",
+        GENERIC_WRITE,
+        FILE_SHARE_READ,
+        NULL,
+        OPEN_EXISTING,
+        FILE_ATTRIBUTE_NORMAL,
+        NULL
+    );
     //Criação Thread Leitura do SCADA
 
     hThreads[0] = (HANDLE)_beginthreadex(
@@ -97,7 +106,8 @@ DWORD WINAPI LeituraSCADAFunc(LPVOID index) {
     char NSEQ[6], ID[4], PRIORIDADE[3], tStamp[8], TIME[9] = "";
     char NSEQ2[6], TEMP_PANELA[7], TEMP_CAMARA[7], PRESSAO_ARG[7], PRESSAO_CAMARA[7], TIME2[9] = "";
     int buffer;
-
+    DWORD dwBytesEnviados;
+    BOOL bStatus;
     while (1) {
         if (seq == 99999) seq = 0;
         if (seq2 == 99999) seq2 = 0;
@@ -148,6 +158,8 @@ DWORD WINAPI LeituraSCADAFunc(LPVOID index) {
 
             sprintf_s(Mensagem, "555;%s;%s;%s;%s;%s;%s", NSEQ2, TEMP_PANELA, TEMP_CAMARA, PRESSAO_ARG, PRESSAO_CAMARA, TIME2);
             cout << Mensagem << endl;
+            bStatus = WriteFile(hMailslot, &Mensagem, sizeof(Mensagem), &dwBytesEnviados, NULL);
+            printf("Bytes enviados= %d\n", dwBytesEnviados);
         }
         if (generateRandom(0, 1)) {
             sprintf_s(NSEQ, "%d", ++seq);
@@ -182,7 +194,10 @@ DWORD WINAPI LeituraSCADAFunc(LPVOID index) {
 
             sprintf_s(Mensagem, "999;%s;%s;%s;%s", NSEQ, ID, PRIORIDADE, TIME);
             cout << Mensagem << endl;
+            bStatus = WriteFile(hMailslot, &Mensagem, sizeof(Mensagem), &dwBytesEnviados, NULL);
+            printf("Bytes enviados= %d\n", dwBytesEnviados);
         }
+        
 
 
         Sleep(generateRandom(1000, 5000));
