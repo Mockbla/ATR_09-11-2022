@@ -13,18 +13,15 @@ int main()
     BOOL bStatus;
     STARTUPINFO si;            // StartUpInformation para novo processo
     PROCESS_INFORMATION NewProcess;    // Informações sobre novo processo criado
-
-    HANDLE hMailsSlotS;
-
-    hMailsSlotS = CreateFileA(
+    HANDLE hMailslot;
+    DWORD dwBytesLidos;
+    char lista_circular[100][50];
+    int indice = 0;
+    hMailslot = CreateMailslotA(
         "\\\\.\\mailslot\\MyMailslot",
-        GENERIC_WRITE,
-        FILE_SHARE_READ,
-        NULL,
-        OPEN_EXISTING,
-        FILE_ATTRIBUTE_NORMAL,
-        NULL
-    );
+        0,
+        MAILSLOT_WAIT_FOREVER,
+        NULL);
 
 
 
@@ -65,6 +62,20 @@ int main()
     a = GetLastError();
     if (a != 0) std::cout << "ERRO: " << a << std::endl;
     while (1) {
+        char mensagem[50];
+        while (indice < 100) {
+            bStatus = ReadFile(hMailslot, &mensagem, sizeof(mensagem), &dwBytesLidos, NULL);
+            int erro = GetLastError();
+            if (erro != 0)std::cout << erro << std::endl;
+            else {
+                strcpy_s(lista_circular[indice], mensagem);
+                std::cout<<"INDICE: "<<indice << lista_circular[indice] << std::endl;
+                indice++;
+            }
+        }
+        Sleep(10000);
+        indice = 0;
+        
 
     }
 

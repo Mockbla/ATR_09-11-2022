@@ -1,10 +1,10 @@
 ﻿  SCADA.cpp
-C:\Users\mateu\Desktop\ATR\SCADA\SCADA\SCADA.cpp(24,6): warning C4215: nonstandard extension used: long float
-C:\Users\mateu\Desktop\ATR\SCADA\SCADA\SCADA.cpp(46,18): warning C4312: 'type cast': conversion from 'int' to 'LPVOID' of greater size
-C:\Users\mateu\Desktop\ATR\SCADA\SCADA\SCADA.cpp(59,18): warning C4312: 'type cast': conversion from 'int' to 'LPVOID' of greater size
-C:\Users\mateu\Desktop\ATR\SCADA\SCADA\SCADA.cpp(72,18): warning C4312: 'type cast': conversion from 'int' to 'LPVOID' of greater size
-C:\Users\mateu\Desktop\ATR\SCADA\SCADA\SCADA.cpp(169,36): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-C:\Users\mateu\Desktop\ATR\SCADA\SCADA\SCADA.cpp(188,29): warning C4244: 'argument': conversion from 'double' to 'DWORD', possible loss of data
-C:\Users\mateu\Desktop\ATR\SCADA\SCADA\SCADA.cpp(97,41): warning C4101: 'tStamp': unreferenced local variable
-C:\Users\mateu\Desktop\ATR\SCADA\SCADA\SCADA.cpp(203,6): warning C4215: nonstandard extension used: long float
-  SCADA.vcxproj -> C:\Users\mateu\Desktop\ATR\SCADA\x64\Debug\SCADA.exe
+C:\Users\Administrator.TRANSCOLAR\Documents\GitHub\ATR_09-11-2022\ATR\SCADA\SCADA\SCADA.cpp(24,6): warning C4215: nonstandard extension used: long float
+C:\Users\Administrator.TRANSCOLAR\Documents\GitHub\ATR_09-11-2022\ATR\SCADA\SCADA\SCADA.cpp(55,18): warning C4312: 'type cast': conversion from 'int' to 'LPVOID' of greater size
+C:\Users\Administrator.TRANSCOLAR\Documents\GitHub\ATR_09-11-2022\ATR\SCADA\SCADA\SCADA.cpp(68,18): warning C4312: 'type cast': conversion from 'int' to 'LPVOID' of greater size
+C:\Users\Administrator.TRANSCOLAR\Documents\GitHub\ATR_09-11-2022\ATR\SCADA\SCADA\SCADA.cpp(81,18): warning C4312: 'type cast': conversion from 'int' to 'LPVOID' of greater size
+C:\Users\Administrator.TRANSCOLAR\Documents\GitHub\ATR_09-11-2022\ATR\SCADA\SCADA\SCADA.cpp(181,36): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+C:\Users\Administrator.TRANSCOLAR\Documents\GitHub\ATR_09-11-2022\ATR\SCADA\SCADA\SCADA.cpp(203,29): warning C4244: 'argument': conversion from 'double' to 'DWORD', possible loss of data
+C:\Users\Administrator.TRANSCOLAR\Documents\GitHub\ATR_09-11-2022\ATR\SCADA\SCADA\SCADA.cpp(106,41): warning C4101: 'tStamp': unreferenced local variable
+C:\Users\Administrator.TRANSCOLAR\Documents\GitHub\ATR_09-11-2022\ATR\SCADA\SCADA\SCADA.cpp(218,6): warning C4215: nonstandard extension used: long float
+  SCADA.vcxproj -> C:\Users\Administrator.TRANSCOLAR\Documents\GitHub\ATR_09-11-2022\ATR\SCADA\x64\Debug\SCADA.exe

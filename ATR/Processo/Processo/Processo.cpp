@@ -1,5 +1,6 @@
 // ConsoleApplication1.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
+#define WNT_LEAN_AND_MEAN
 #include <iostream>
 #include <conio.h>
 #include <Windows.h>
@@ -22,6 +23,10 @@
 #define P 112
 #define Z 122
 #define X 120
+HANDLE hMailslot;
+
+
+
 using namespace std;
 int tecla;
 double generateRandom(int inicial, int final) {
@@ -67,6 +72,8 @@ unsigned __stdcall teclado(void* pArgument) {
 }
 unsigned __stdcall computador_processo(void* pArgument) {
     int nseq = 0;
+    DWORD dwBytesEnviados;
+    BOOL bStatus;
     while (true) {
         int random_time = rand() % 5000;
         Sleep(random_time);
@@ -105,11 +112,22 @@ unsigned __stdcall computador_processo(void* pArgument) {
         }
         sprintf_s(mensagem, "001|%s|%s|%s|%s|%s", nseq_s, sp_press_arg_s, sp_temp_s, sp_press_s, time);
         cout << mensagem << endl;
+        bStatus = WriteFile(hMailslot, &mensagem, sizeof(mensagem), &dwBytesEnviados, NULL);
+        printf("Bytes enviados= %d\n", dwBytesEnviados);
     }
 
 }
 int main()
 {
+    hMailslot = CreateFileA(
+        "\\\\.\\mailslot\\MyMailslot",
+        GENERIC_WRITE,
+        FILE_SHARE_READ,
+        NULL,
+        OPEN_EXISTING,
+        FILE_ATTRIBUTE_NORMAL,
+        NULL
+    );
 
     HANDLE TreadTeclado;
     unsigned dwTreadID;
