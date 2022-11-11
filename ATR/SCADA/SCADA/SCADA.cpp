@@ -1,224 +1,76 @@
-#define WIN32_LEAN_AND_MEAN
-#define _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES 1
-#include <windows.h>
-#include <process.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <conio.h>
+// ConsoleApplication1.cpp : This file contains the 'main' function. Program execution begins and ends there.
+//
+#define WNT_LEAN_AND_MEAN
 #include <iostream>
+#include <conio.h>
+#include <Windows.h>
+#include <process.h>
+#include <ctime>
+#include <math.h>
+#include <string>
+#include <sstream>
+#include<chrono>
+#include <format>
 #include <cstring>
-#include <chrono>
-
-
-#define NUM_THREADS 3
-
-
-typedef unsigned (WINAPI* CAST_FUNCTION)(LPVOID);
-typedef unsigned* CAST_LPDWORD;
-
-DWORD TID[3];
-
-DWORD WINAPI LeituraSCADAFunc(LPVOID);
-DWORD WINAPI MensagensFunc(LPVOID);
-DWORD WINAPI AlarmesFunc(LPVOID);
-long float generateRandom(int inicial, int final);
-
-HANDLE hThreads[3];
-HANDLE hMailslot;
-
-
-extern char listaCircular[100][50];
-
-int i, seq = 0, seq2 = 0;
-
+HANDLE hteclaESC;
+HANDLE hteclap;
+HANDLE hteclaz;
 using namespace std;
+unsigned __stdcall limpa_tela(void* pArgument) {
 
+	while (1) {
+		HANDLE Events[2] = { hteclaESC,hteclaz };
+		int tipo_evento;
+		do {
+			int ret = WaitForMultipleObjects(2, Events, false, INFINITE);
+			tipo_evento = ret - WAIT_OBJECT_0;
+			if (tipo_evento == 1)
+				system("cls");
+			else if (tipo_evento == 0) {
+				cout << "Thread de limpar a tela encerrada\n";
+				_endthreadex(0);
+			}
+		} while (tipo_evento != 0);
+
+	}
+}
 int main() {
-    DWORD dwThreadId;
-    DWORD dwExitCode = 0;
-    DWORD dwRet;
-    hMailslot = CreateFileA(
-        "\\\\.\\mailslot\\MyMailslot",
-        GENERIC_WRITE,
-        FILE_SHARE_READ,
-        NULL,
-        OPEN_EXISTING,
-        FILE_ATTRIBUTE_NORMAL,
-        NULL
-    );
-    //Criação Thread Leitura do SCADA
-
-    hThreads[0] = (HANDLE)_beginthreadex(
-        NULL,
-        0,
-        (CAST_FUNCTION)LeituraSCADAFunc,
-        (LPVOID)i,
-        0,
-        (CAST_LPDWORD)&dwThreadId
-    );
-    TID[0] = dwThreadId;
-    if (hThreads[0]) printf("ThreadLeituraSCADA Id= %0x\n", dwThreadId);
-
-    //Criação Thread Mensagens
-
-    hThreads[1] = (HANDLE)_beginthreadex(
-        NULL,
-        0,
-        (CAST_FUNCTION)MensagensFunc,
-        (LPVOID)i,
-        0,
-        (CAST_LPDWORD)&dwThreadId
-    );
-    TID[1] = dwThreadId;
-    if (hThreads[1]) printf("ThreadMensagens Id= %0x\n", dwThreadId);
-
-    //Criação Thread Alarmes
-
-    hThreads[2] = (HANDLE)_beginthreadex(
-        NULL,
-        0,
-        (CAST_FUNCTION)AlarmesFunc,
-        (LPVOID)i,
-        0,
-        (CAST_LPDWORD)&dwThreadId
-    );
-    TID[2] = dwThreadId;
-    if (hThreads[2]) printf("ThreadAlarmes Id= %0x\n", dwThreadId);
-
-    // Espera todas as threads terminarem
-    dwRet = WaitForMultipleObjects(NUM_THREADS, hThreads, TRUE, INFINITE);
-    //ADD CHECKFORERROR
-
-    for (i = 0; i < NUM_THREADS; ++i) {
-        GetExitCodeThread(hThreads[i], &dwExitCode);
-        printf("Thread %02d terminou\n", i);
-        CloseHandle(hThreads[i]);	// apaga referência ao objeto
-    }
-
-    printf("\nAcione uma tecla para terminar\n");
-    _getch(); // // Pare aqui, caso não esteja executando no ambiente MDS
-
-    return EXIT_SUCCESS;
-};
-
-DWORD WINAPI LeituraSCADAFunc(LPVOID index) {
-    char Mensagem[50];
-    char NSEQ[6], ID[4], PRIORIDADE[3], tStamp[8], TIME[9] = "";
-    char NSEQ2[6], TEMP_PANELA[7], TEMP_CAMARA[7], PRESSAO_ARG[7], PRESSAO_CAMARA[7], TIME2[9] = "";
-    int buffer;
-    DWORD dwBytesEnviados;
-    BOOL bStatus;
-    while (1) {
-        if (seq == 99999) seq = 0;
-        if (seq2 == 99999) seq2 = 0;
-        if (!generateRandom(0, 1)) {
-
-            sprintf_s(NSEQ2, "%d", ++seq2);
-            if (strlen(NSEQ2) == 1) {
-                sprintf_s(NSEQ2, "0000%d", seq2);
-            }
-            else if (strlen(NSEQ2) == 2) {
-                sprintf_s(NSEQ2, "000%d", seq2);
-            }
-            else if (strlen(NSEQ2) == 3) {
-                sprintf_s(NSEQ2, "00%d", seq2);
-            }
-            else if (strlen(NSEQ2) == 4) {
-                sprintf_s(NSEQ, "0%d", seq2);
-            }
-
-            sprintf_s(TEMP_PANELA, "%.1lf", generateRandom(10000, 16000) / 10);
-
-            sprintf_s(TEMP_CAMARA, "%.1lf", generateRandom(1000, 16000) / 10);
-            if (strlen(TEMP_CAMARA) == 5) {
-                sprintf_s(TEMP_CAMARA, "0%s", TEMP_CAMARA);
-            }
-
-            sprintf_s(PRESSAO_ARG, "%.1lf", generateRandom(10000, 50000) / 10);
-
-            double aux = generateRandom(0, 10000) / 10;
-            sprintf_s(PRESSAO_CAMARA, "%.1lf", aux);
-            if (strlen(PRESSAO_CAMARA) == 3) {
-                sprintf_s(PRESSAO_CAMARA, "000%.1lf", aux);
-            }
-            else if (strlen(PRESSAO_CAMARA) == 4) {
-                sprintf_s(PRESSAO_CAMARA, "00%.1lf", aux);
-            }
-            else if (strlen(PRESSAO_CAMARA) == 5) {
-                sprintf_s(PRESSAO_CAMARA, "0%.1lf", aux);
-            }
-
-            chrono::system_clock::time_point p = chrono::system_clock::now();
-            time_t t = chrono::system_clock::to_time_t(p);
-            char str[26];
-            ctime_s(str, sizeof str, &t);
-            for (int i = 11; i <= 18; i++) {
-                TIME2[i - 11] = str[i];
-            }
-
-            sprintf_s(Mensagem, "555;%s;%s;%s;%s;%s;%s", NSEQ2, TEMP_PANELA, TEMP_CAMARA, PRESSAO_ARG, PRESSAO_CAMARA, TIME2);
-            cout << Mensagem << endl;
-            bStatus = WriteFile(hMailslot, &Mensagem, sizeof(Mensagem), &dwBytesEnviados, NULL);
-            printf("Bytes enviados= %d\n", dwBytesEnviados);
-        }
-        if (generateRandom(0, 1)) {
-            sprintf_s(NSEQ, "%d", ++seq);
-            if (strlen(NSEQ) == 1) {
-                sprintf_s(NSEQ, "0000%d", seq);
-            }
-            else if (strlen(NSEQ) == 2) {
-                sprintf_s(NSEQ, "000%d", seq);
-            }
-            else if (strlen(NSEQ) == 3) {
-                sprintf_s(NSEQ, "00%d", seq);
-            }
-            else if (strlen(NSEQ) == 4) {
-                sprintf_s(NSEQ, "0%d", seq);
-            }
-
-            sprintf_s(ID, "%d", 123);
-
-            buffer = generateRandom(1, 99);
-            sprintf_s(PRIORIDADE, "%d", buffer);
-            if (strlen(PRIORIDADE) == 1) {
-                sprintf_s(PRIORIDADE, "0%d", buffer);
-            }
-
-            chrono::system_clock::time_point p = chrono::system_clock::now();
-            time_t t = chrono::system_clock::to_time_t(p);
-            char str[26];
-            ctime_s(str, sizeof str, &t);
-            for (int i = 11; i <= 18; i++) {
-                TIME[i - 11] = str[i];
-            }
-
-            sprintf_s(Mensagem, "999;%s;%s;%s;%s", NSEQ, ID, PRIORIDADE, TIME);
-            cout << Mensagem << endl;
-            bStatus = WriteFile(hMailslot, &Mensagem, sizeof(Mensagem), &dwBytesEnviados, NULL);
-            printf("Bytes enviados= %d\n", dwBytesEnviados);
-        }
-        
+	hteclaz = OpenEventA(EVENT_ALL_ACCESS, TRUE, "tecla_z");
+	if (GetLastError() != 0)cout << "O evento z nao foi aberto erro: " << GetLastError() << endl;
+	hteclap = OpenEventA(EVENT_ALL_ACCESS, TRUE, "tecla_p");
+	if (GetLastError() != 0)cout << "O evento p nao foi aberto erro: " << GetLastError() << endl;
+	hteclaESC = OpenEventA(EVENT_ALL_ACCESS, TRUE, "tecla_ESC");
+	if (GetLastError() != 0)cout << "O evento esc nao foi aberto erro: " << GetLastError() << endl;
+	//CRIAR THREAD LIMPAR TELA
+	printf("Criando Thread leitura do teclado...\n");
+	HANDLE ThreadLeituraTeclado;
+	unsigned ThreadLeituraTecladoID;
+	ThreadLeituraTeclado = (HANDLE)_beginthreadex(
+		NULL,
+		0,
+		limpa_tela,
+		NULL,
+		0,
+		&ThreadLeituraTecladoID
+	);
+	if (GetLastError() != 0)cout << "Thread limpar a tela não foi criada: " << GetLastError() << endl;
+	else cout << "Thread limpar a tela criada com sucesso TID: " << ThreadLeituraTecladoID << endl;
 
 
-        Sleep(generateRandom(1000, 5000));
+	while (1) {
+		HANDLE Events[2] = { hteclaESC,hteclap };
+		int tipo_evento = 1;
+		do {
 
-    }
-
-    return(0);
-};
-
-DWORD WINAPI MensagensFunc(LPVOID index) {
-    return(0);
-};
-
-DWORD WINAPI AlarmesFunc(LPVOID index) {
-    return(0);
-};
-
-long float generateRandom(int inicial, int final) {
-
-    int random = inicial + (rand() % (final - inicial + 1));
-
-    return random;
-};
-
+			int ret = WaitForMultipleObjects(2, Events, FALSE, INFINITE);//AQUI ESPERA OU PELO ESC, OU PELO EVENTO DA TECLA C (PADRAO TRUE), PARA QUE POSSA OU ENCERRAR(ESC),CONTINUAR(C),BLOQUEAR(!C)
+			tipo_evento = ret - WAIT_OBJECT_0;
+			if (tipo_evento == 1) {
+				cout << "Tarefa de exibir mensagens de alarme: \n" << endl; //COMO NAO ERA NECESSARIO FAZER A LIGACAO DA LISTA CIRCULAR COM ESTE PROCESSO PARA A ETAPA 1, IMPRIME TEXTO GENERICO PARA MOSTRAR QUE AS FUNCOES DE TECLADO ESTAO FUNCIONANDO
+				Sleep(1000);
+			}
+		} while (tipo_evento != 0);
+		cout << "Processo de exibir mensagens de alarme encerrada\nPressione qualquer tecla para fechar esta janela";
+		getchar();
+		return(0);
+	}
+}

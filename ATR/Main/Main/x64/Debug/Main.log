@@ -1,3 +1,12 @@
 ﻿  main.cpp
-  The contents of <filesystem> are available only with C++17 or later.
-  Main.vcxproj -> C:\Users\Administrator.TRANSCOLAR\Documents\GitHub\ATR_09-11-2022\ATR\Main\x64\Debug\Main.exe
+  The contents of <format> are available only with C++20 or later.
+C:\Users\mateu\Documents\GitHub\ATR_09-11-2022\ATR\Main\Main\main.cpp(190,37): warning C4244: 'argument': conversion from 'double' to 'DWORD', possible loss of data
+C:\Users\mateu\Documents\GitHub\ATR_09-11-2022\ATR\Main\Main\main.cpp(146,10): warning C4101: 'bStatus': unreferenced local variable
+C:\Users\mateu\Documents\GitHub\ATR_09-11-2022\ATR\Main\Main\main.cpp(282,44): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+C:\Users\mateu\Documents\GitHub\ATR_09-11-2022\ATR\Main\Main\main.cpp(303,37): warning C4244: 'argument': conversion from 'double' to 'DWORD', possible loss of data
+C:\Users\mateu\Documents\GitHub\ATR_09-11-2022\ATR\Main\Main\main.cpp(206,10): warning C4101: 'bStatus': unreferenced local variable
+C:\Users\mateu\Documents\GitHub\ATR_09-11-2022\ATR\Main\Main\main.cpp(205,11): warning C4101: 'dwBytesEnviados': unreferenced local variable
+C:\Users\mateu\Documents\GitHub\ATR_09-11-2022\ATR\Main\Main\main.cpp(202,41): warning C4101: 'tStamp': unreferenced local variable
+C:\Users\mateu\Documents\GitHub\ATR_09-11-2022\ATR\Main\Main\main.cpp(319,12): warning C4101: 'hMailslot': unreferenced local variable
+C:\Users\mateu\Documents\GitHub\ATR_09-11-2022\ATR\Main\Main\main.cpp(320,11): warning C4101: 'dwBytesLidos': unreferenced local variable
+  Main.vcxproj -> C:\Users\mateu\Documents\GitHub\ATR_09-11-2022\ATR\Main\x64\Debug\Main.exe

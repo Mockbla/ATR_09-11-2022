@@ -12,143 +12,65 @@
 #include<chrono>
 #include <format>
 #include <cstring>
-
-
-//DEFINICAO DO VALOR NUMERICO DE CADA TECLA PARA A FUNCAO _GETCH
-#define	ESC 27
-#define C 99
-#define S 115
-#define M 109
-#define A 97
-#define P 112
-#define Z 122
-#define X 120
-HANDLE hMailslot;
-
-
-
+HANDLE hteclaESC;
+HANDLE hteclap;
+HANDLE hteclax;
 using namespace std;
-int tecla;
-double generateRandom(int inicial, int final) {
-    int range = final - inicial + 1;
-    int random = inicial + (rand() % range);
-    return random;
-};
-unsigned __stdcall teclado(void* pArgument) {
-    while (true) {
-        tecla = _getch();
-        cout << tecla << "\n";
-        switch (tecla) {
-        case ESC:
-            cout << "TECLA ESC APERTADA\n";
-            break;
-        case C:
-            cout << "TECLA C APERTADA\n";
-            break;
-        case S:
-            cout << "TECLA S APERTADA\n";
-            break;
-        case M:
-            cout << "TECLA M APERTADA\n";
-            break;
-        case A:
-            cout << "TECLA A APERTADA\n";
-            break;
-        case P:
-            cout << "TECLA P APERTADA\n";
-            break;
-        case Z:
-            cout << "TECLA Z APERTADA\n";
-            break;
-        case X:
-            cout << "TECLA X APERTADA\n";
-            break;
-        default:
-            cout << "TECLA INVALIDA\n";
-            break;
-        }
+unsigned __stdcall limpa_tela(void* pArgument) {
+	
+	while (1) {
+		HANDLE Events[2] = { hteclaESC,hteclax };
+		int tipo_evento;
+		do {
+			int ret = WaitForMultipleObjects(2, Events, false, INFINITE);
+			tipo_evento = ret - WAIT_OBJECT_0;
+			if(tipo_evento==1)
+			system("cls");
+			else if (tipo_evento == 0) {
+				cout << "Thread de limpar a tela encerrada\n";
+				_endthreadex(0);
+			}
+		} while (tipo_evento != 0);
 
-    }
+	}
 }
-unsigned __stdcall computador_processo(void* pArgument) {
-    int nseq = 0;
-    DWORD dwBytesEnviados;
-    BOOL bStatus;
-    while (true) {
-        int random_time = rand() % 5000;
-        Sleep(random_time);
-        char mensagem[38] = "";
-        if (nseq == 99999) nseq = 0;
-        nseq++;
-        double sp_press_arg = generateRandom(10000, 50000) / 10;
-        double sp_temp = generateRandom(9000, 16000) / 10;//900 - 1600
-        double sp_press = generateRandom(10, 999) / 10; //1 99.9
-        chrono::system_clock::time_point p = chrono::system_clock::now();
-        time_t t = chrono::system_clock::to_time_t(p);
-        char str[26] = "";
-        ctime_s(str, sizeof str, &t);
-        char time[9] = "";
-        for (int i = 11; i <= 18; i++) {
-            time[i - 11] = str[i];
-        }
-        char sp_press_arg_s[7] = "", sp_temp_s[7] = "", sp_press_s[5] = "", nseq_s[6] = "";
-        sprintf_s(sp_press_arg_s, "%.1lf", sp_press_arg);
-        sprintf_s(sp_temp_s, "%.1lf", sp_temp);
-        sprintf_s(sp_press_s, "%.1lf", sp_press);
-        sprintf_s(nseq_s, "%d", nseq);
-        if (strlen(sp_temp_s) == 5) sprintf_s(sp_temp_s, "0%.1lf", sp_temp);
-        if (strlen(sp_press_s) == 3) sprintf_s(sp_press_s, "0%.1lf", sp_press);
-        if (strlen(nseq_s) == 1) {
-            sprintf_s(nseq_s, "0000%d", nseq);
-        }
-        else if (strlen(nseq_s) == 2) {
-            sprintf_s(nseq_s, "000%d", nseq);
-        }
-        else if (strlen(nseq_s) == 3) {
-            sprintf_s(nseq_s, "00%d", nseq);
-        }
-        else if (strlen(nseq_s) == 4) {
-            sprintf_s(nseq_s, "0%d", nseq);
-        }
-        sprintf_s(mensagem, "001|%s|%s|%s|%s|%s", nseq_s, sp_press_arg_s, sp_temp_s, sp_press_s, time);
-        cout << mensagem << endl;
-        bStatus = WriteFile(hMailslot, &mensagem, sizeof(mensagem), &dwBytesEnviados, NULL);
-        printf("Bytes enviados= %d\n", dwBytesEnviados);
-    }
+int main() {
+	hteclax = OpenEventA(EVENT_ALL_ACCESS, TRUE, "tecla_x");
+	if (GetLastError() != 0)cout << "O evento x nao foi aberto erro: " << GetLastError() << endl;
+	hteclap = OpenEventA(EVENT_ALL_ACCESS, TRUE, "tecla_p");
+	if (GetLastError() != 0)cout << "O evento p nao foi aberto erro: " << GetLastError() << endl;
+	hteclaESC = OpenEventA(EVENT_ALL_ACCESS, TRUE, "tecla_ESC");
+	if (GetLastError() != 0)cout << "O evento esc nao foi aberto erro: " << GetLastError() << endl;
+	//CRIAR THREAD LIMPAR TELA
+	printf("Criando Thread leitura do teclado...\n");
+	HANDLE ThreadLeituraTeclado;
+	unsigned ThreadLeituraTecladoID;
+	ThreadLeituraTeclado = (HANDLE)_beginthreadex(
+		NULL,
+		0,
+		limpa_tela,
+		NULL,
+		0,
+		&ThreadLeituraTecladoID
+	);
+	if (GetLastError() != 0)cout << "Thread limpar a tela não foi criada: " << GetLastError() << endl;
+	else cout << "Thread limpar a tela criada com sucesso TID: " << ThreadLeituraTecladoID << endl;
 
-}
-int main()
-{
-    hMailslot = CreateFileA(
-        "\\\\.\\mailslot\\MyMailslot",
-        GENERIC_WRITE,
-        FILE_SHARE_READ,
-        NULL,
-        OPEN_EXISTING,
-        FILE_ATTRIBUTE_NORMAL,
-        NULL
-    );
 
-    HANDLE TreadTeclado;
-    unsigned dwTreadID;
-    TreadTeclado = (HANDLE)_beginthreadex(
-        NULL,
-        0,
-        teclado,
-        NULL,
-        0,
-        &dwTreadID
-    );
-    HANDLE ThreadComputadorProcesso;
-    TreadTeclado = (HANDLE)_beginthreadex(
-        NULL,
-        0,
-        computador_processo,
-        NULL,
-        0,
-        &dwTreadID
-    );
-    //TRATAMENTO DE ERRO AQUI !
-    while (tecla != ESC) {
-    }
+	while (1) {
+		HANDLE Events[2] = { hteclaESC,hteclap };
+		int tipo_evento = 1;
+		do{
+
+			int ret = WaitForMultipleObjects(2, Events, FALSE, INFINITE);//AQUI ESPERA OU PELO ESC, OU PELO EVENTO DA TECLA C (PADRAO TRUE), PARA QUE POSSA OU ENCERRAR(ESC),CONTINUAR(C),BLOQUEAR(!C)
+			tipo_evento = ret - WAIT_OBJECT_0;
+			if (tipo_evento == 1) {
+				cout << "Tarefa de exibir mensagens do computador do processoAAA: \n" << endl; //COMO NAO ERA NECESSARIO FAZER A LIGACAO DA LISTA CIRCULAR COM ESTE PROCESSO PARA A ETAPA 1, IMPRIME TEXTO GENERICO PARA MOSTRAR QUE AS FUNCOES DE TECLADO ESTAO FUNCIONANDO
+				Sleep(1000);
+			}
+		}while (tipo_evento != 0);
+		cout << "Processo de exibir mensagens do computador do processo encerrada\nPressione qualquer tecla para fechar esta janela";
+		getchar();
+		return(0);
+	}
 }

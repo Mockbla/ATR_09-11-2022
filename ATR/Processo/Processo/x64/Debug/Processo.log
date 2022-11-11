@@ -1,4 +1,4 @@
 ﻿  Processo.cpp
   The contents of <format> are available only with C++20 or later.
-C:\Users\Administrator.TRANSCOLAR\Documents\GitHub\ATR_09-11-2022\ATR\Processo\Processo\Processo.cpp(142,12): warning C4101: 'ThreadComputadorProcesso': unreferenced local variable
-  Processo.vcxproj -> C:\Users\Administrator.TRANSCOLAR\Documents\GitHub\ATR_09-11-2022\ATR\Processo\x64\Debug\Processo.exe
+  LINK : C:\Users\mateu\Documents\GitHub\ATR_09-11-2022\ATR\Main\x64\Debug\Processo.exe not found or not built by the last incremental link; performing full link
+  Processo.vcxproj -> C:\Users\mateu\Documents\GitHub\ATR_09-11-2022\ATR\Main\x64\Debug\Processo.exe
